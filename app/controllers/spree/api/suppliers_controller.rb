@@ -4,7 +4,7 @@ module Spree
 
       def index
           supplier_scope = Spree::Supplier.accessible_by(current_ability, :read);
-          if params[:q][:featured_eq]
+          if params[:q] && params[:q][:featured_eq].present?
             supplier_scope = supplier_scope.order('random()')
           end
           @suppliers = supplier_scope.ransack(params[:q]).result.page(params[:page]).per(params[:per_page])
@@ -12,13 +12,13 @@ module Spree
       end
 
       def show
-        @supplier = Spree::Supplier.find(params[:id])
+        @supplier = Spree::Supplier.accessible_by(current_ability, :read).find(params[:id])
         respond_with(@supplier)
       end
 
       def update
         @supplier = Spree::Supplier.friendly.find(params[:id])
-        authorize! :update, @suppplier
+        authorize! :update, @supplier
 
         if @supplier.update_attributes supplier_params
           respond_with(@supplier.reload, :status => 200, :default_template => :show)

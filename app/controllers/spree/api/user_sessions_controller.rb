@@ -3,6 +3,11 @@ module Spree
     class UserSessionsController < Spree::Api::BaseController
 
       def create
+        authorize! :create, :spree_user
+        unless params[:user].present?
+          params.require(:user).permit(:email, :password)
+          return
+        end
         email = params[:user][:email].downcase
         @user = Spree::User.find_by_email(email)
         if @user.nil?
