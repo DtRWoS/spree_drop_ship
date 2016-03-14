@@ -18,7 +18,7 @@ class Spree::SuppliersController < Spree::StoreController
   end
 
   def new
-    @supplier = Spree::Supplier.new(address_attributes: {})
+    @supplier = Spree::Supplier.new
     @title = "New Shop"
     @body_id = 'shop-manage'
     @selected = 'new'
@@ -27,9 +27,6 @@ class Spree::SuppliersController < Spree::StoreController
   def create
     params[:supplier][:email] = spree_current_user.email
     @supplier = Spree::Supplier.new supplier_params
-    address = Spree::Address.new address_params
-    address.save
-    @supplier.address = address
     if @supplier.save
       flash[:success] = "Your shop has been created! Verify your account."
       redirect_to verify_supplier_path(@supplier)
@@ -48,7 +45,6 @@ class Spree::SuppliersController < Spree::StoreController
 
   def edit
     @body_id = 'shop-manage'
-    @supplier.address = Spree::Address.default unless @supplier.address.present?
   end
 
   def update
@@ -58,15 +54,6 @@ class Spree::SuppliersController < Spree::StoreController
     if @supplier.update_attributes(supplier_params)
       if(!params[:supplier][:banner].present? and params[:supplier][:crop].present?)
         @supplier.reprocess_banner
-      end
-      if params[:supplier][:address_attributes][:id].present?
-        address = Spree::Address.find(params[:supplier][:address_attributes][:id])
-        address.update address_params
-      else
-        address = Spree::Address.new address_params
-        address.save
-        @supplier.address = address
-        @supplier.save
       end
       flash[:success] = "Your shop has been updated!"
       redirect_to @supplier
@@ -118,11 +105,6 @@ class Spree::SuppliersController < Spree::StoreController
   end
 
   def supplier_params
-    params.require(:supplier).permit(:name, :slug, :description, :banner, :email, :address_attributes, :return_policy, :crop)
-  end
-
-  def address_params
-    supplier = params[:supplier]
-    supplier.require(:address_attributes).permit(Spree::PermittedAttributes.address_attributes)
+    params.require(:supplier).permit(:name, :slug, :description, :banner, :email, :crop)
   end
 end
