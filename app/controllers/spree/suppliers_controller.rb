@@ -85,7 +85,7 @@ class Spree::SuppliersController < Spree::StoreController
 
   def is_new_supplier
     unless !spree_current_user.supplier?
-      redirect_to new_product_path
+      redirect_to new_design_path
     end
   end
 
