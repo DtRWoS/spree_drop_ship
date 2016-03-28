@@ -2,7 +2,6 @@ class Spree::Admin::SuppliersController < Spree::Admin::ResourceController
   after_filter :delete_products, only: [:destroy]
 
   def edit
-    @object.address = Spree::Address.default unless @object.address.present?
     respond_with(@object) do |format|
       format.html { render :layout => !request.xhr? }
       format.js   { render :layout => false }
@@ -10,7 +9,7 @@ class Spree::Admin::SuppliersController < Spree::Admin::ResourceController
   end
 
   def new
-    @object = Spree::Supplier.new(address_attributes: {country_id: Spree::Address.default.country_id})
+    @object = Spree::Supplier.new()
   end
 
   private
