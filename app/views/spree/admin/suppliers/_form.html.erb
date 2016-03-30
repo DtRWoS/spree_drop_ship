@@ -33,6 +33,10 @@
         <%= form.label :users %><br/>
         <%= hidden_field_tag 'supplier[user_ids_string]', form.object.user_ids.join(','), class: 'user_picker' %>
       <% end %>
+      <%= form.field_container :banner, class: ['form-group'] do %>
+        <%= form.label :banner, Spree::Supplier.human_attribute_name(:banner) %><br />
+        <%= form.file_field :banner, :class => 'form-control' %>
+      <% end %>
       <%= form.field_container :active, class: ['form-group'] do %>
         <div class="checkbox">
         <%= label_tag :active do %>

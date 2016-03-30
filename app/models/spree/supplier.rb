@@ -8,7 +8,7 @@ class Spree::Supplier < Spree::Base
 
   attr_accessor :password, :password_confirmation, :remove_banner
 
-  has_attached_file :banner, :styles => { :large => ["770x230#",:jpg], :small => ["320x90#",:jpg] },
+  has_attached_file :banner, :styles => { :brand => ["1360x418#", :jpg], :large => ["770x230#",:jpg], :small => ["320x90#",:jpg] },
                     :default_style => :large,
                     :default_url => "noimage/:attachment-:style.png",
                     :processors => [:cropper],
