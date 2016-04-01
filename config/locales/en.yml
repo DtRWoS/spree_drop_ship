@@ -10,6 +10,7 @@ en:
         url: URL
         slug: Supplier URL
         banner: Supplier Banner
+        hero: Supplier Hero
     errors:
       models:
         spree/supplier:

@@ -33,9 +33,13 @@
         <%= form.label :users %><br/>
         <%= hidden_field_tag 'supplier[user_ids_string]', form.object.user_ids.join(','), class: 'user_picker' %>
       <% end %>
-      <%= form.field_container :banner, class: ['form-group'] do %>
-        <%= form.label :banner, Spree::Supplier.human_attribute_name(:banner) %><br />
-        <%= form.file_field :banner, :class => 'form-control' %>
+      <%= form.field_container :profile_image, class: ['form-group'] do %>
+        <%= form.label :profile_image, Spree::Supplier.human_attribute_name(:profile_image) %><br />
+        <%= form.file_field :profile_image, :class => 'form-control' %>
+      <% end %>
+      <%= form.field_container :hero, class: ['form-group'] do %>
+        <%= form.label :hero, Spree::Supplier.human_attribute_name(:hero) %><br />
+        <%= form.file_field :hero, :class => 'form-control' %>
       <% end %>
       <%= form.field_container :active, class: ['form-group'] do %>
         <div class="checkbox">

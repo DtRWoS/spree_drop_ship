@@ -8,7 +8,11 @@ class Spree::Supplier < Spree::Base
 
   attr_accessor :password, :password_confirmation, :remove_banner
 
-  has_attached_file :banner, :styles => { :brand => ["1360x418#", :jpg], :large => ["770x230#",:jpg], :small => ["320x90#",:jpg] },
+  # TODO - what dimensions should hero be? profile image?
+  # TODO - update large/small aspect ratios for banner to reflect redesign
+  # TODO - does hero/profile_image need the cropper preprocessor? default url? convert options?
+  # TODO - add dimensions to the hero/profile_image labels (both on admin and user forms)
+  has_attached_file :banner, :styles => { :large => ["770x230#",:jpg], :small => ["320x90#",:jpg] },
                     :default_style => :large,
                     :default_url => "noimage/:attachment-:style.png",
                     :processors => [:cropper],
@@ -26,7 +30,41 @@ class Spree::Supplier < Spree::Base
                     :url => ":s3_domain_url",
                     :path => "/suppliers/:id/:attachment/:style.:extension"
 
+  has_attached_file :hero, :styles => { :large => ["1360x418#", :jpg] },
+                    :default_style => :large,
+                    :convert_options => {
+                        :all => "-strip -auto-orient -quality 75 -interlace Plane -colorspace sRGB"
+                    },
+                    :s3_credentials => {
+                        :access_key_id => ENV["AWS_ACCESS_KEY_ID"],
+                        :secret_access_key => ENV["AWS_SECRET_ACCESS_KEY"]
+                    },
+                    :storage => :s3,
+                    :s3_headers => {"Cache-Control" => "max-age=31557600"},
+                    :s3_protocol => "https",
+                    :bucket => ENV["S3_BUCKET_NAME"],
+                    :url => ":s3_domain_url",
+                    :path => "/suppliers/:id/:attachment/:style.:extension"
+
+  has_attached_file :profile_image, :styles => { :medium => ["300x300#", :jpg] },
+                    :default_style => :medium,
+                    :convert_options => {
+                        :all => "-strip -auto-orient -quality 75 -interlace Plane -colorspace sRGB"
+                    },
+                    :s3_credentials => {
+                        :access_key_id => ENV["AWS_ACCESS_KEY_ID"],
+                        :secret_access_key => ENV["AWS_SECRET_ACCESS_KEY"]
+                    },
+                    :storage => :s3,
+                    :s3_headers => {"Cache-Control" => "max-age=31557600"},
+                    :s3_protocol => "https",
+                    :bucket => ENV["S3_BUCKET_NAME"],
+                    :url => ":s3_domain_url",
+                    :path => "/suppliers/:id/:attachment/:style.:extension"
+
   validates_attachment_content_type :banner, :content_type => /\Aimage/
+  validates_attachment_content_type :hero, :content_type =>/\Aimage/
+  validates_attachment_content_type :profile_image, :content_type =>/\Aimage/
 
   #==========================================
   # Associations

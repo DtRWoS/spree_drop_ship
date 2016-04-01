@@ -105,6 +105,8 @@ class Spree::SuppliersController < Spree::StoreController
   end
 
   def supplier_params
-    params.require(:supplier).permit(:name, :slug, :description, :banner, :email, :crop)
+    # TODO - crop field currently applies to the banner - may need to rename or change
+    params.require(:supplier).permit(:name, :slug, :description, :banner, :email, :crop,
+    :hero, :profile_image, :facebook_url, :twitter_url, :instagram_url, :pinterest_url)
   end
 end
