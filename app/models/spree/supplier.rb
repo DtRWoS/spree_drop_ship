@@ -46,7 +46,7 @@ class Spree::Supplier < Spree::Base
                     :url => ":s3_domain_url",
                     :path => "/suppliers/:id/:attachment/:style.:extension"
 
-  has_attached_file :profile_image, :styles => { :medium => ["300x300#", :jpg] },
+  has_attached_file :profile_image, :styles => { :medium => ["300x300#", :jpg], :small => ["150x150#"] },
                     :default_style => :medium,
                     :convert_options => {
                         :all => "-strip -auto-orient -quality 75 -interlace Plane -colorspace sRGB"
