@@ -3,6 +3,7 @@ class Spree::SuppliersController < Spree::StoreController
   before_filter :is_new_supplier, only: [:new]
   before_filter :supplier, only: [:edit, :update, :show, :verify, :destroy]
   before_filter :is_supplier, only: [:edit, :update, :verify, :destroy]
+  before_filter :social_counts, only: [:show]
 
   def index
     suppliers = Spree::Supplier.joins("LEFT JOIN spree_favorites ON spree_favorites.favorable_type = 'Spree::Supplier' AND spree_favorites.favorable_id = spree_suppliers.id")
@@ -108,5 +109,55 @@ class Spree::SuppliersController < Spree::StoreController
     # TODO - crop field currently applies to the banner - may need to rename or change
     params.require(:supplier).permit(:name, :slug, :description, :banner, :email, :crop,
     :hero, :profile_image, :facebook_url, :twitter_url, :instagram_url, :pinterest_url)
+  end
+
+  def social_counts
+    # TODO - need to parse brand social urls for usernames
+    if @supplier.verified_brand?
+      @fb_access_token = ENV['FB_ACCESS_TOKEN'] #client side
+      @ig_access_token = ENV['IG_ACCESS_TOKEN'] #client side
+      @tw_followers = twitter_follower_count('4ndrewChen') #server side
+      @pi_followers = pinterest_count('http://www.pinterest.com/pinterest/') #server side
+    end
+  end
+
+  def twitter_access_token
+    ### use this to regain twitter access token if lost/invalidated ###
+    require 'httpclient'
+    require 'base64'
+    require 'uri'
+
+    credentials = "#{ENV['TW_CONSUMER_KEY']}:#{ENV['TW_CONSUMER_SECRET']}"
+    encoded = Base64.encode64(credentials).split(/\n/).join('')
+    headers = {
+        'Authorization' => "Basic #{encoded}",
+        'Content-Type' => 'application/x-www-form-urlencoded;charset=UTF-8'
+    }
+    uri = URI.parse('https://api.twitter.com/oauth2/token')
+    http_client = HTTPClient.new
+    response = http_client.post(uri, {grant_type: 'client_credentials'}, headers)
+    JSON.parse(response.body)['access_token']
+  end
+
+  def twitter_follower_count(username)
+    require 'httpclient'
+    require 'uri'
+
+    headers = {
+        'Authorization' => "Bearer #{ENV['TW_ACCESS_TOKEN']}"
+    }
+    follower_url = 'https://api.twitter.com/1.1/users/show.json?screen_name=' + username
+    uri = URI.parse(follower_url)
+    http_client = HTTPClient.new
+    response = http_client.get(uri, nil, headers)
+    JSON.parse(response.body)['followers_count']
+  end
+
+  def pinterest_count(url)
+    require 'open-uri'
+    require 'open_uri_redirections'
+
+    doc = Nokogiri::HTML(open(url, {ssl_verify_mode: OpenSSL::SSL::VERIFY_NONE, :allow_redirections => :safe}))
+    doc.xpath("//meta[@name='pinterestapp:followers']").first.attributes['content'].value
   end
 end
