@@ -12,7 +12,7 @@ class Spree::Supplier < Spree::Base
   # TODO - update large/small aspect ratios for banner to reflect redesign
   # TODO - does hero/profile_image need the cropper preprocessor? default url? convert options?
   # TODO - add dimensions to the hero/profile_image labels (both on admin and user forms)
-  has_attached_file :banner, :styles => { :large => ["770x230#",:jpg], :small => ["320x90#",:jpg] },
+  has_attached_file :banner, :styles => { :large => ["655x230#",:jpg], :small => ["320x112#",:jpg] },
                     :default_style => :large,
                     :default_url => "noimage/:attachment-:style.png",
                     :processors => [:cropper],
@@ -46,7 +46,7 @@ class Spree::Supplier < Spree::Base
                     :url => ":s3_domain_url",
                     :path => "/suppliers/:id/:attachment/:style.:extension"
 
-  has_attached_file :profile_image, :styles => { :medium => ["300x300#", :jpg] },
+  has_attached_file :profile_image, :styles => { :medium => ["300x300#", :jpg], :small => ["150x150#"] },
                     :default_style => :medium,
                     :convert_options => {
                         :all => "-strip -auto-orient -quality 75 -interlace Plane -colorspace sRGB"
@@ -98,7 +98,7 @@ class Spree::Supplier < Spree::Base
   # Callbacks
 
   after_create :assign_user
-  after_create :create_stock_location
+  # after_create :create_stock_location
   after_create :send_welcome, if: -> { SpreeDropShip::Config[:send_supplier_email] }
   after_create :save_banner, :if => :cropping?
   after_update :save_banner, :if => :cropping?

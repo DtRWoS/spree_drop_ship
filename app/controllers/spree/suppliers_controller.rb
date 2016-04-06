@@ -29,8 +29,8 @@ class Spree::SuppliersController < Spree::StoreController
     params[:supplier][:email] = spree_current_user.email
     @supplier = Spree::Supplier.new supplier_params
     if @supplier.save
-      flash[:success] = "Your shop has been created! Verify your account."
-      redirect_to verify_supplier_path(@supplier)
+      flash[:success] = "Your shop has been created! Create a new design."
+      redirect_to new_design_path(:onboard => true)
     else
       render "new"
     end
@@ -85,7 +85,7 @@ class Spree::SuppliersController < Spree::StoreController
   end
 
   def is_new_supplier
-    unless !spree_current_user.supplier?
+    if spree_current_user.supplier?
       redirect_to new_design_path
     end
   end
