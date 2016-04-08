@@ -116,8 +116,8 @@ class Spree::SuppliersController < Spree::StoreController
     if @supplier.verified_brand?
       @fb_access_token = ENV['FB_ACCESS_TOKEN'] #client side
       @ig_access_token = ENV['IG_ACCESS_TOKEN'] #client side
-      @tw_followers = twitter_follower_count('4ndrewChen') #server side
-      @pi_followers = pinterest_count('http://www.pinterest.com/pinterest/') #server side
+      @tw_followers = twitter_follower_count() #server side
+      @pi_followers = pinterest_count() #server side
     end
   end
 
@@ -139,9 +139,17 @@ class Spree::SuppliersController < Spree::StoreController
     JSON.parse(response.body)['access_token']
   end
 
-  def twitter_follower_count(username)
+  def twitter_follower_count()
     require 'httpclient'
     require 'uri'
+
+    if(@supplier.twitter_url.empty?)
+      return nil
+    end
+
+    twitter_url = @supplier.twitter_url
+    username = twitter_url.match('^https?://(www\.)?twitter\.com/(#!/)?(?<name>[^/]+)(/\w+)*$')
+    username = username[1]
 
     headers = {
         'Authorization' => "Bearer #{ENV['TW_ACCESS_TOKEN']}"
@@ -153,11 +161,16 @@ class Spree::SuppliersController < Spree::StoreController
     JSON.parse(response.body)['followers_count']
   end
 
-  def pinterest_count(url)
+  def pinterest_count()
     require 'open-uri'
     require 'open_uri_redirections'
 
-    doc = Nokogiri::HTML(open(url, {ssl_verify_mode: OpenSSL::SSL::VERIFY_NONE, :allow_redirections => :safe}))
+    if(@supplier.pinterest_url.empty?)
+      return nil
+    end
+
+    pinterest_url = @supplier.pinterest_url
+    doc = Nokogiri::HTML(open(pinterest_url, {ssl_verify_mode: OpenSSL::SSL::VERIFY_NONE, :allow_redirections => :safe}))
     doc.xpath("//meta[@name='pinterestapp:followers']").first.attributes['content'].value
   end
 end
