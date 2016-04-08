@@ -49,9 +49,7 @@ class Spree::SuppliersController < Spree::StoreController
   end
 
   def update
-    if params[:remove_banner].present?
-      @supplier.remove_banner = params[:remove_banner]
-    end
+    image_check
     if @supplier.update_attributes(supplier_params)
       if(!params[:supplier][:banner].present? and params[:supplier][:crop].present?)
         @supplier.reprocess_banner
@@ -73,6 +71,18 @@ class Spree::SuppliersController < Spree::StoreController
   end
 
   private
+
+  def image_check
+    if params[:remove_banner].present?
+      @supplier.remove_banner = params[:remove_banner]
+    end
+    if params[:remove_profile_image].present?
+      @supplier.remove_profile_image = params[:remove_profile_image]
+    end
+    if params[:remove_hero_image].present?
+      @supplier.remove_hero_image = params[:remove_hero_image]
+    end
+  end
 
   def check_authorization
     if try_spree_current_user.nil?
