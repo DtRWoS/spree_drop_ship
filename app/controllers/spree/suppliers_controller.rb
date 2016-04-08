@@ -112,12 +112,11 @@ class Spree::SuppliersController < Spree::StoreController
   end
 
   def social_counts
-    # TODO - need to parse brand social urls for usernames
     if @supplier.verified_brand?
-      @fb_access_token = ENV['FB_ACCESS_TOKEN'] #client side
-      @ig_access_token = ENV['IG_ACCESS_TOKEN'] #client side
-      @tw_followers = twitter_follower_count() #server side
-      @pi_followers = pinterest_count() #server side
+      @fb_fans = facebook_count()
+      @ig_followers = instagram_count()
+      @tw_followers = twitter_follower_count()
+      @pi_followers = pinterest_count()
     end
   end
 
@@ -172,5 +171,52 @@ class Spree::SuppliersController < Spree::StoreController
     pinterest_url = @supplier.pinterest_url
     doc = Nokogiri::HTML(open(pinterest_url, {ssl_verify_mode: OpenSSL::SSL::VERIFY_NONE, :allow_redirections => :safe}))
     doc.xpath("//meta[@name='pinterestapp:followers']").first.attributes['content'].value
+  end
+
+  def facebook_count()
+    require 'httpclient'
+    require 'uri'
+
+    if(@supplier.facebook_url.empty?)
+      return nil
+    end
+
+    facebook_url = @supplier.facebook_url
+    page_name = facebook_url.match('/(?:(?:http|https):\/\/)?(?:www.)?(?:facebook.com)\/([A-Za-z0-9-_]+)/*')
+    page_name = page_name[1]
+
+    headers = {
+        'Authorization' => "Bearer #{ENV['FB_ACCESS_TOKEN']}"
+    }
+    url = 'https://graph.facebook.com/' + page_name + '?fields=likes'
+    uri = URI.parse(url)
+    http_client = HTTPClient.new
+    response = http_client.get(uri, nil, headers)
+    JSON.parse(response.body)['likes']
+  end
+
+  def instagram_count()
+    require 'httpclient'
+    require 'uri'
+
+    if(@supplier.instagram_url.empty?)
+      return nil
+    end
+
+    instagram_url = @supplier.instagram_url
+    username = instagram_url.match('/(?:(?:http|https):\/\/)?(?:www.)?(?:instagram.com|instagr.am)\/([A-Za-z0-9-_]+)/*')
+    search_for_id_url = 'https://api.instagram.com/v1/users/search?q=' + username[1] + '&access_token=' + ENV['IG_ACCESS_TOKEN']
+
+    #first call to grab the user id
+    uri = URI.parse(search_for_id_url)
+    http_client = HTTPClient.new
+    response = http_client.get(uri)
+    instagram_id = JSON.parse(response.body)['data'][0]['id']
+
+    #second call to get the follower count
+    follower_uri = URI.parse("https://api.instagram.com/v1/users/#{instagram_id}/?access_token=#{ENV['IG_ACCESS_TOKEN']}")
+    follower_http_client = HTTPClient.new
+    follower_response = follower_http_client.get(follower_uri)
+    JSON.parse(follower_response.body)['data']['counts']['followed_by']
   end
 end
