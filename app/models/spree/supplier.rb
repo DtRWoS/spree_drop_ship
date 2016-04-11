@@ -6,7 +6,7 @@ class Spree::Supplier < Spree::Base
 
   acts_as_paranoid
 
-  attr_accessor :password, :password_confirmation, :remove_banner
+  attr_accessor :password, :password_confirmation, :remove_banner, :remove_profile_image, :remove_hero_image
 
   # TODO - what dimensions should hero be? profile image?
   # TODO - update large/small aspect ratios for banner to reflect redesign
@@ -105,6 +105,8 @@ class Spree::Supplier < Spree::Base
   before_create :set_commission
   before_validation :check_url
   before_save :delete_banner, if: -> {self.remove_banner == 'true'}
+  before_save :delete_profile_image, if: -> {self.remove_profile_image == 'true'}
+  before_save :delete_hero_image, if: -> {self.remove_hero_image == 'true'}
 
   #==========================================
   # Instance Methods
@@ -197,6 +199,14 @@ class Spree::Supplier < Spree::Base
     def delete_banner
       self.banner = nil
       self.crop = nil
+    end
+
+    def delete_profile_image
+      self.profile_image = nil
+    end
+
+    def delete_hero_image
+      self.hero = nil
     end
 
 end
