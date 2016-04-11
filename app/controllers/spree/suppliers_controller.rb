@@ -72,7 +72,6 @@ class Spree::SuppliersController < Spree::StoreController
   end
 
   private
-
   def image_check
     if params[:remove_banner].present?
       @supplier.remove_banner = params[:remove_banner]
