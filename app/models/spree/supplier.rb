@@ -30,7 +30,7 @@ class Spree::Supplier < Spree::Base
                     :url => ":s3_domain_url",
                     :path => "/suppliers/:id/:attachment/:style.:extension"
 
-  has_attached_file :hero, :styles => { :large => ["1360x418#", :jpg] },
+  has_attached_file :hero, :styles => { :large => ["1360x418#", :jpg], :small => ["320x98#"] },
                     :default_style => :large,
                     :default_url => "noimage/:attachment-:style.png",
                     :convert_options => {
