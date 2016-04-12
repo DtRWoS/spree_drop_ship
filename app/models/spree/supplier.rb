@@ -32,6 +32,7 @@ class Spree::Supplier < Spree::Base
 
   has_attached_file :hero, :styles => { :large => ["1360x418#", :jpg] },
                     :default_style => :large,
+                    :default_url => "noimage/:attachment-:style.png",
                     :convert_options => {
                         :all => "-strip -auto-orient -quality 75 -interlace Plane -colorspace sRGB"
                     },
@@ -48,6 +49,7 @@ class Spree::Supplier < Spree::Base
 
   has_attached_file :profile_image, :styles => { :medium => ["300x300#", :jpg], :small => ["150x150#"] },
                     :default_style => :medium,
+                    :default_url => "noimage/:attachment-:style.png",
                     :convert_options => {
                         :all => "-strip -auto-orient -quality 75 -interlace Plane -colorspace sRGB"
                     },
