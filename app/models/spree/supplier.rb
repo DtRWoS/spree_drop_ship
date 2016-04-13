@@ -30,7 +30,7 @@ class Spree::Supplier < Spree::Base
                     :url => ":s3_domain_url",
                     :path => "/suppliers/:id/:attachment/:style.:extension"
 
-  has_attached_file :hero, :styles => { :large => ["1360x418#", :jpg], :small => ["320x98#"] },
+  has_attached_file :hero, :styles => { :large => ["1300x400#", :jpg], :small => ["320x98#"] },
                     :default_style => :large,
                     :default_url => "noimage/:attachment-:style.png",
                     :convert_options => {
@@ -47,7 +47,7 @@ class Spree::Supplier < Spree::Base
                     :url => ":s3_domain_url",
                     :path => "/suppliers/:id/:attachment/:style.:extension"
 
-  has_attached_file :profile_image, :styles => { :medium => ["300x300#", :jpg], :small => ["150x150#"] },
+  has_attached_file :profile_image, :styles => { :large => ["500x500#", :jpg], :medium => ["300x300#", :jpg], :small => ["150x150#"] },
                     :default_style => :medium,
                     :default_url => "noimage/:attachment-:style.png",
                     :convert_options => {
