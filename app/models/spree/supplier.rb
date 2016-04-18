@@ -100,12 +100,12 @@ class Spree::Supplier < Spree::Base
   after_create :assign_user
   # after_create :create_stock_location
   after_create :send_welcome, if: -> { SpreeDropShip::Config[:send_supplier_email] }
-  after_create :save_banner, :if => :banner_cropping?
-  after_update :save_banner, :if => :banner_cropping?
-  after_create :save_profile_image, :if => :profile_image_cropping?
-  after_update :save_profile_image, :if => :profile_image_cropping?
-  after_create :save_hero, :if => :hero_cropping?
-  after_update :save_hero, :if => :hero_cropping?
+  after_create :save_banner, if: -> {self.cropping?('banner_crop')}
+  after_update :save_banner, if: -> {self.cropping?('banner_crop')}
+  after_create :save_profile_image, if: -> {self.cropping?('profile_image_crop')}
+  after_update :save_profile_image, if: -> {self.cropping?('profile_image_crop')}
+  after_create :save_hero, if: -> {self.cropping?('hero_crop')}
+  after_update :save_hero, if: -> {self.cropping?('hero_crop')}
   before_create :set_commission
   before_validation :check_url
   before_save :delete_banner, if: -> {self.remove_banner == 'true'}
@@ -116,20 +116,8 @@ class Spree::Supplier < Spree::Base
   # Instance Methods
   scope :active, -> { where(active: true) }
 
-  def cropping?
-    !self['crop'].blank?
-  end
-
-  def banner_cropping?
-    !self['banner_crop'].blank?
-  end
-
-  def profile_image_cropping?
-    !self['profile_image_crop'].blank?
-  end
-
-  def hero_cropping?
-    !self['hero_crop'].blank?
+  def cropping?(crop_field)
+    !self[crop_field].blank?
   end
 
   def save_banner

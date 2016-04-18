@@ -86,15 +86,9 @@ class Spree::SuppliersController < Spree::StoreController
 
   private
   def reprocess_images_check
-    if(!params[:supplier][:banner].present? and params[:supplier][:banner_crop].present?)
-      @supplier.reprocess_banner
-    end
-    if(!params[:supplier][:profile_image].present? and params[:supplier][:profile_image_crop].present?)
-      @supplier.reprocess_profile_image
-    end
-    if(!params[:supplier][:hero].present? and params[:supplier][:hero_crop].present?)
-      @supplier.reprocess_hero
-    end
+    @supplier.reprocess_banner if @supplier.cropping?('banner_crop')
+    @supplier.reprocess_profile_image if @supplier.cropping?('profile_image_crop')
+    @supplier.reprocess_hero if @supplier.cropping?('hero_crop')
   end
 
   def delete_images_check
