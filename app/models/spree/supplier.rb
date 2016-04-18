@@ -6,12 +6,8 @@ class Spree::Supplier < Spree::Base
 
   acts_as_paranoid
 
-  attr_accessor :password, :password_confirmation, :remove_banner, :remove_profile_image, :remove_hero_image
+  attr_accessor :password, :password_confirmation, :remove_banner, :remove_profile_image, :remove_hero
 
-  # TODO - what dimensions should hero be? profile image?
-  # TODO - update large/small aspect ratios for banner to reflect redesign
-  # TODO - does hero/profile_image need the cropper preprocessor? default url? convert options?
-  # TODO - add dimensions to the hero/profile_image labels (both on admin and user forms)
   has_attached_file :banner, :styles => { :large => ["655x230#",:jpg], :small => ["320x112#",:jpg] },
                     :default_style => :large,
                     :default_url => "noimage/:attachment-:style.png",
@@ -33,6 +29,7 @@ class Spree::Supplier < Spree::Base
   has_attached_file :hero, :styles => { :large => ["1300x400#", :jpg], :small => ["320x98#"] },
                     :default_style => :large,
                     :default_url => "noimage/:attachment-:style.png",
+                    :processors => [:cropper],
                     :convert_options => {
                         :all => "-strip -auto-orient -quality 75 -interlace Plane -colorspace sRGB"
                     },
@@ -50,6 +47,7 @@ class Spree::Supplier < Spree::Base
   has_attached_file :profile_image, :styles => { :large => ["500x500#", :jpg], :medium => ["300x300#", :jpg], :small => ["150x150#"] },
                     :default_style => :medium,
                     :default_url => "noimage/:attachment-:style.png",
+                    :processors => [:cropper],
                     :convert_options => {
                         :all => "-strip -auto-orient -quality 75 -interlace Plane -colorspace sRGB"
                     },
@@ -102,13 +100,17 @@ class Spree::Supplier < Spree::Base
   after_create :assign_user
   # after_create :create_stock_location
   after_create :send_welcome, if: -> { SpreeDropShip::Config[:send_supplier_email] }
-  after_create :save_banner, :if => :cropping?
-  after_update :save_banner, :if => :cropping?
+  after_create :save_banner, :if => :banner_cropping?
+  after_update :save_banner, :if => :banner_cropping?
+  after_create :save_profile_image, :if => :profile_image_cropping?
+  after_update :save_profile_image, :if => :profile_image_cropping?
+  after_create :save_hero, :if => :hero_cropping?
+  after_update :save_hero, :if => :hero_cropping?
   before_create :set_commission
   before_validation :check_url
   before_save :delete_banner, if: -> {self.remove_banner == 'true'}
   before_save :delete_profile_image, if: -> {self.remove_profile_image == 'true'}
-  before_save :delete_hero_image, if: -> {self.remove_hero_image == 'true'}
+  before_save :delete_hero, if: -> {self.remove_hero == 'true'}
 
   #==========================================
   # Instance Methods
@@ -118,13 +120,43 @@ class Spree::Supplier < Spree::Base
     !self['crop'].blank?
   end
 
+  def banner_cropping?
+    !self['banner_crop'].blank?
+  end
+
+  def profile_image_cropping?
+    !self['profile_image_crop'].blank?
+  end
+
+  def hero_cropping?
+    !self['hero_crop'].blank?
+  end
+
   def save_banner
     banner.assign(banner)
     banner.save
   end
 
+  def save_profile_image
+    profile_image.assign(profile_image)
+    profile_image.save
+  end
+
+  def save_hero
+    hero.assign(hero)
+    hero.save
+  end
+
   def reprocess_banner
     banner.reprocess!
+  end
+
+  def reprocess_profile_image
+    profile_image.reprocess!
+  end
+
+  def reprocess_hero
+    hero.reprocess!
   end
 
   def deleted?
@@ -200,15 +232,17 @@ class Spree::Supplier < Spree::Base
 
     def delete_banner
       self.banner = nil
-      self.crop = nil
+      self.banner_crop = nil
     end
 
     def delete_profile_image
       self.profile_image = nil
+      self.profile_image_crop = nil
     end
 
-    def delete_hero_image
+    def delete_hero
       self.hero = nil
+      self.hero_crop = nil
     end
 
 end

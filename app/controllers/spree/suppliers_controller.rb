@@ -65,11 +65,9 @@ class Spree::SuppliersController < Spree::StoreController
   end
 
   def update
-    image_check
+    delete_images_check
     if @supplier.update_attributes(supplier_params)
-      if(!params[:supplier][:banner].present? and params[:supplier][:crop].present?)
-        @supplier.reprocess_banner
-      end
+      reprocess_images_check
       flash[:success] = "Your shop has been updated!"
       redirect_to @supplier
     else
@@ -87,15 +85,27 @@ class Spree::SuppliersController < Spree::StoreController
   end
 
   private
-  def image_check
+  def reprocess_images_check
+    if(!params[:supplier][:banner].present? and params[:supplier][:banner_crop].present?)
+      @supplier.reprocess_banner
+    end
+    if(!params[:supplier][:profile_image].present? and params[:supplier][:profile_image_crop].present?)
+      @supplier.reprocess_profile_image
+    end
+    if(!params[:supplier][:hero].present? and params[:supplier][:hero_crop].present?)
+      @supplier.reprocess_hero
+    end
+  end
+
+  def delete_images_check
     if params[:remove_banner].present?
       @supplier.remove_banner = params[:remove_banner]
     end
     if params[:remove_profile_image].present?
       @supplier.remove_profile_image = params[:remove_profile_image]
     end
-    if params[:remove_hero_image].present?
-      @supplier.remove_hero_image = params[:remove_hero_image]
+    if params[:remove_hero].present?
+      @supplier.remove_hero = params[:remove_hero]
     end
   end
 
@@ -131,9 +141,8 @@ class Spree::SuppliersController < Spree::StoreController
   end
 
   def supplier_params
-    # TODO - crop field currently applies to the banner - may need to rename or change
-    params.require(:supplier).permit(:name, :slug, :description, :banner, :email, :crop,
-    :hero, :profile_image, :facebook_url, :twitter_url, :instagram_url, :pinterest_url)
+    params.require(:supplier).permit(:name, :slug, :description, :banner, :email, :hero, :profile_image,
+    :facebook_url, :twitter_url, :instagram_url, :pinterest_url, :banner_crop, :profile_image_crop, :hero_crop)
   end
 
   def social_counts
