@@ -12,6 +12,10 @@
       <%# email validation %>
       <%= error_message_on :user, :email %>
     <% end %>
+    <%= form.field_container :url_name, class: ['form-group'] do %>
+        <%= form.label :url_name, Spree::Supplier.human_attribute_name(:url_name) %>:<br />
+        <%= form.text_field :url_name, :class => 'form-control' %>
+    <% end %>
     <%= form.field_container :url, class: ['form-group'] do %>
       <%= form.label :url, Spree::Supplier.human_attribute_name(:url) %>:<br />
       <%= form.text_field :url, :class => 'form-control' %>

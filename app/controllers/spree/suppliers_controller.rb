@@ -135,7 +135,7 @@ class Spree::SuppliersController < Spree::StoreController
   end
 
   def supplier_params
-    params.require(:supplier).permit(:name, :slug, :description, :banner, :email, :hero, :profile_image,
+    params.require(:supplier).permit(:name, :slug, :description, :banner, :email, :hero, :profile_image, :url, :url_name,
     :facebook_url, :twitter_url, :instagram_url, :pinterest_url, :banner_crop, :profile_image_crop, :hero_crop)
   end
 
