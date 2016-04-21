@@ -67,7 +67,7 @@ class Spree::SuppliersController < Spree::StoreController
   def update
     delete_images_check
     if @supplier.update_attributes(supplier_params)
-      reprocess_images_check
+      # reprocess_images_check
       flash[:success] = "Your shop has been updated!"
       redirect_to @supplier
     else
