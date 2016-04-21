@@ -52,11 +52,7 @@ class Spree::SuppliersController < Spree::StoreController
   end
 
   def show
-    products = @supplier.products
-    unless (try_spree_current_user && spree_current_user.supplier_id == @supplier.id ) || (try_spree_current_user && spree_current_user.has_spree_role?("admin"))
-      products = products.available
-    end
-    @products = products.sort_by { |p| [p.favorites.count, p.featured ? 1 : 0, p.created_at]}.reverse
+    @products = @supplier.products.active.sort_by { |p| [p.favorites.count, p.featured ? 1 : 0, p.created_at]}.reverse
     @body_id = 'shop-details'
   end
 
