@@ -26,7 +26,7 @@ class Spree::Supplier < Spree::Base
                     :url => ":s3_domain_url",
                     :path => "/suppliers/:id/:attachment/:style.:extension"
 
-  has_attached_file :hero, :styles => { :large => ["1300x400#", :jpg], :small => ["320x98#"] },
+  has_attached_file :hero, :styles => { :large => ["1360x418#", :jpg], :small => ["320x98#"] },
                     :default_style => :large,
                     :default_url => "noimage/:attachment-:style.png",
                     :processors => [:cropper],
@@ -101,11 +101,8 @@ class Spree::Supplier < Spree::Base
   # after_create :create_stock_location
   after_create :send_welcome, if: -> { SpreeDropShip::Config[:send_supplier_email] }
   after_create :save_banner, if: -> {self.cropping?('banner_crop')}
-  after_update :save_banner, if: -> {self.cropping?('banner_crop')}
   after_create :save_profile_image, if: -> {self.cropping?('profile_image_crop')}
-  after_update :save_profile_image, if: -> {self.cropping?('profile_image_crop')}
   after_create :save_hero, if: -> {self.cropping?('hero_crop')}
-  after_update :save_hero, if: -> {self.cropping?('hero_crop')}
   before_create :set_commission
   before_validation :check_url
   before_save :delete_banner, if: -> {self.remove_banner == 'true'}

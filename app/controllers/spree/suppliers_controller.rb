@@ -63,7 +63,7 @@ class Spree::SuppliersController < Spree::StoreController
   def update
     delete_images_check
     if @supplier.update_attributes(supplier_params)
-      # reprocess_images_check
+      reprocess_images_check
       flash[:success] = "Your shop has been updated!"
       redirect_to @supplier
     else
@@ -82,21 +82,15 @@ class Spree::SuppliersController < Spree::StoreController
 
   private
   def reprocess_images_check
-    @supplier.reprocess_banner if @supplier.cropping?('banner_crop')
-    @supplier.reprocess_profile_image if @supplier.cropping?('profile_image_crop')
-    @supplier.reprocess_hero if @supplier.cropping?('hero_crop')
+    @supplier.reprocess_banner if params[:supplier][:banner_crop].present? && !!params[:supplier][:banner_crop]
+    @supplier.reprocess_profile_image if params[:supplier][:profile_image_crop].present? && !!params[:supplier][:profile_image_crop]
+    @supplier.reprocess_hero if params[:supplier][:hero_crop].present? && !!params[:supplier][:hero_crop]
   end
 
   def delete_images_check
-    if params[:remove_banner].present?
-      @supplier.remove_banner = params[:remove_banner]
-    end
-    if params[:remove_profile_image].present?
-      @supplier.remove_profile_image = params[:remove_profile_image]
-    end
-    if params[:remove_hero].present?
-      @supplier.remove_hero = params[:remove_hero]
-    end
+    @supplier.remove_banner = params[:remove_banner] if params[:remove_banner].present?
+    @supplier.remove_profile_image = params[:remove_profile_image] if params[:remove_profile_image].present?
+    @supplier.remove_hero = params[:remove_hero] if params[:remove_hero].present?
   end
 
   def check_authorization
