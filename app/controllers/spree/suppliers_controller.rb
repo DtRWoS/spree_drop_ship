@@ -4,6 +4,7 @@ class Spree::SuppliersController < Spree::StoreController
   before_filter :supplier, only: [:edit, :update, :show, :verify, :destroy]
   before_filter :is_supplier, only: [:edit, :update, :verify, :destroy]
   before_filter :social_counts, only: [:show]
+  before_filter :first_product_success, only: [:show]
 
   def index
     suppliers = Spree::Supplier.joins("LEFT JOIN spree_favorites ON spree_favorites.favorable_type = 'Spree::Supplier' AND spree_favorites.favorable_id = spree_suppliers.id")
@@ -81,6 +82,13 @@ class Spree::SuppliersController < Spree::StoreController
   end
 
   private
+  def first_product_success
+    if(!@supplier.created_products? && @supplier.products.length > 0)
+      @supplier.update_attribute(:created_products, true)
+      @first_product = true
+    end
+  end
+
   def reprocess_images_check
     @supplier.reprocess_banner if params[:supplier][:banner_crop].present? && !!params[:supplier][:banner_crop]
     @supplier.reprocess_profile_image if params[:supplier][:profile_image_crop].present? && !!params[:supplier][:profile_image_crop]
@@ -126,7 +134,7 @@ class Spree::SuppliersController < Spree::StoreController
 
   def supplier_params
     params.require(:supplier).permit(:name, :slug, :description, :banner, :email, :hero, :profile_image, :url, :url_name,
-    :facebook_url, :twitter_url, :instagram_url, :pinterest_url, :banner_crop, :profile_image_crop, :hero_crop)
+    :facebook_url, :twitter_url, :instagram_url, :pinterest_url, :banner_crop, :profile_image_crop, :hero_crop, :created_products)
   end
 
   def social_counts
