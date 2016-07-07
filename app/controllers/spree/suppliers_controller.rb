@@ -13,7 +13,7 @@ class Spree::SuppliersController < Spree::StoreController
     else
       @suppliers = suppliers.where(:active => true).page(params[:page]).per(15)
     end
-    @title = "Pet Shops"
+    @title = "Shops"
     @body_id = 'shops'
   end
 
@@ -105,7 +105,7 @@ class Spree::SuppliersController < Spree::StoreController
   def supplier
     @supplier = Spree::Supplier.friendly.find(params[:id])
     unless @supplier.public? || (try_spree_current_user && (spree_current_user.supplier_id === @supplier.id || spree_current_user.has_spree_role?("admin")))
-      flash[:warning] = "Pet shop not available!"
+      flash[:warning] = "Shop not available!"
       redirect_to suppliers_path
     end
   end
